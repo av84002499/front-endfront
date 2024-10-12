@@ -20,7 +20,7 @@ function AddNewPokemon({setReload}) {
             console.log('Name:', formData.get('name'));
             console.log('Types:', formData.get('types'));
             console.log('Sprite:', formData.get('sprite'));
-            const res = await api.post('/pokemons/', formData);
+            const res = await api.post('/api/pokemons/', formData);
             setReload(true);
             setName('');
             setTypes('');

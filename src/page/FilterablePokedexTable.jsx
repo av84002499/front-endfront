@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PokemonRow from '../components/PokemonRow'
 import api from '../api'
-import AddNewPokemon from './AddNewPokemon'
+import AddNewPokemon from '../components/AddNewPokemon'
+import PokemonView from '../components/PokemonView'
 
 
 function FilterablePokedexTable() {
     const [pokemons, setPokemons] = useState([])
+    const [viewPokemon, setViewPokemon] = useState(null)
     const [reload, setReload] = useState(false)
     const [selectedType, setSelectedType] = useState('All');
 
@@ -19,7 +21,7 @@ function FilterablePokedexTable() {
 
     const loadData = async () => {
         try {
-            const res = await api.get('/pokemons/');
+            const res = await api.get('/api/pokemons/');
             setPokemons(res.data);
         } catch (err) {
             alert(err);
@@ -33,39 +35,45 @@ function FilterablePokedexTable() {
 
     return (
         <div className='m-0 p-0'>
-            <div className='m-3'>
-                <div className="card border-light-subtle mb-3">
-                    <div className="card-header">
-                        <h1>Pokemons</h1>
+            <div className='m-3 row'>
+                <div className='col-md-8'>
+                    <div className="card border-light-subtle mb-3">
+                        <div className="card-header">
+                            <h1>Pokemons</h1>
+                        </div>
+                        <div className="card-body">
+                            <table className="table">
+                                <thead className="table-success">
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">
+                                            Types
+                                            <select className='ms-2 rounded-pill px-2 py-1 w-50' onChange={e => setSelectedType(e.target.value)} value={selectedType}>
+                                                <option value="All">All</option>
+                                                {uniqueTypes.map(type => (
+                                                    <option key={type} value={type}>{type}</option>
+                                                ))}
+                                            </select></th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredPokemons.map((pokemon, index) => (
+                                        <PokemonRow
+                                            pokemon={pokemon}
+                                            setReload={setReload}
+                                            setViewPokemon={setViewPokemon}
+                                            key={index}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                            <AddNewPokemon setReload={setReload} />
+                        </div>
                     </div>
-                    <div className="card-body">
-                        <table className="table">
-                            <thead className="table-success">
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">
-                                        Types
-                                        <select className='ms-2 rounded-pill px-2 py-1 w-50' onChange={e => setSelectedType(e.target.value)} value={selectedType}>
-                                            <option value="All">All</option>
-                                            {uniqueTypes.map(type => (
-                                                <option key={type} value={type}>{type}</option>
-                                            ))}
-                                        </select></th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredPokemons.map((pokemon, index) => (
-                                    <PokemonRow
-                                        pokemon={pokemon}
-                                        setReload={setReload}
-                                        key={index}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
-                        <AddNewPokemon setReload={setReload} />
-                    </div>
+                </div>
+                <div className='col-md-4'>
+                    {viewPokemon ? <PokemonView {...viewPokemon} /> : "Please select a pokemon to view it's details."}
                 </div>
             </div>
         </div>
